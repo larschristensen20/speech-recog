@@ -3,7 +3,106 @@ grammar dk.sdu.mdsd.Speechrecognition with org.eclipse.xtext.common.Terminals
 generate speechrecognition "http://www.sdu.dk/mdsd/Speechrecognition"
 
 Model:
-	greetings+=Greeting*;
-	
-Greeting:
-	'Hello' name=ID '!';
+	agent=Agent intents+=Intent* entitytypes+=EntityType*
+;
+
+Agent:
+	{Agent} 'agent' '{'value+=AgentValue*'}'
+;
+
+AgentValue:
+	aa=AgentAttribute '=' value=Value
+;
+
+AgentAttribute:
+	('parent' | 'displayName' | 'defaultLanguageCode' | 'timezone' | 'enableLogging')  
+;
+
+Value:
+	ValueName | bool=Bool
+;
+
+ValueName:
+	name=ID
+;
+
+Bool:
+	'true' | 'false'
+;
+
+
+// Intents----------------------------------------------------------------------------------------------------------------
+Intent:
+	{Intent} 'intent' '{'value+=IntentValue*'}'
+;
+
+IntentValue:
+	IntentRequired | IntentOptional
+;
+
+IntentRequired:
+	IntentDisplayNameRequired
+;
+
+
+IntentDisplayNameRequired:
+	'displayName' '=' name=ID
+;
+
+IntentOptional:
+	KeyValue | List
+;
+
+KeyValue:
+	'action' '=' name=ID
+;
+
+List:
+	TrainingPhrases | Parameters
+;
+
+TrainingPhrases:
+	'trainingPhrases' '{' phrases+=Phrase+'}'
+;
+
+Phrase:
+	'phrase' ':' sentences+=Sentence(',' sentences+=Sentence)*
+;
+
+Sentence:
+	{Sentence} (words+=Words)+ ('('entity=ID')')?
+;
+
+Words:
+	name = ID
+;
+
+Parameters:
+	{Parameters} 'parameters' '{'parameters+=Parameter*'}'
+;
+
+Parameter:
+	('required')? 'parameter' '{''name' '=' name=ID 'entityType' '=' type=ID ('prompt' ':' prompt+=Prompt(','prompt+=Prompt)*)? '}'
+;
+
+Prompt:
+	name=ID
+;
+
+
+// EntityType ---------------------------------------------------------------------------------------------------------------------
+EntityType:
+	'entityType' '{' 'name' '=' name=ID 'autoExpansition' '=' exp=('true'|'false') entities+=Entities+ '}'	
+;
+
+Entities:
+	'entities' '{' entity+=Entity+ '}'
+;
+
+Entity:
+	'entity' '{' 'value' '=' value=ID 'synonym' '=' syn+=Synonym(',' syn+=Synonym)* '}'
+;
+
+Synonym:
+	syn=ID
+;
