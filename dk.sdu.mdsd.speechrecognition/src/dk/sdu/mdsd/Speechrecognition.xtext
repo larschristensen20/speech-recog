@@ -1,0 +1,9 @@
+grammar dk.sdu.mdsd.Speechrecognition with org.eclipse.xtext.common.Terminals
+
+generate speechrecognition "http://www.sdu.dk/mdsd/Speechrecognition"
+
+Model:
+	greetings+=Greeting*;
+	
+Greeting:
+	'Hello' name=ID '!';
