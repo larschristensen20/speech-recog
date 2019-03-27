@@ -60,7 +60,7 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 	
 	@Check
 	def checkIfParamsAreAllowed(AgentValue agentVal) {
-		if(agentVal.aa === "parent" && (agentVal.value.bool === 'true' || agentVal.value.bool === 'false')) {
+		if(agentVal.aa == "parent" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
 			error('Type mismatch: parent cannot be set to ' +agentVal.value.bool, 
 				SpeechrecognitionPackage.Literals.AGENT__VALUE,
 				MISSING_AGENT_PARENT)
