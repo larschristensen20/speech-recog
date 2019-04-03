@@ -7,6 +7,9 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.generator.AbstractGenerator
 import org.eclipse.xtext.generator.IFileSystemAccess2
 import org.eclipse.xtext.generator.IGeneratorContext
+import dk.sdu.mdsd.speechrecognition.Agent
+import dk.sdu.mdsd.speechrecognition.AgentValue
+import dk.sdu.mdsd.speechrecognition.ValueName
 
 /**
  * Generates code from your model files on save.
@@ -16,10 +19,24 @@ import org.eclipse.xtext.generator.IGeneratorContext
 class SpeechrecognitionGenerator extends AbstractGenerator {
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
-//		fsa.generateFile('greetings.txt', 'People to greet: ' + 
-//			resource.allContents
-//				.filter(Greeting)
-//				.map[name]
-//				.join(', '))
+		resource.allContents.filter(Agent).forEach[generateAgentJSON]
 	}
+	
+	def generateAgentJSON(Agent agent) {
+		
+		//JSONObject json = new JSONObject()
+		
+		for(m : agent.value) {
+			print(m.aa + ": ")
+			if(m.value.bool === null) {
+				val value = m.value
+				if(value instanceof ValueName) {
+					println((value as ValueName).name)
+				}
+			} else {
+				println(m.value.bool)
+			}
+		}
+	}
+	
 }
