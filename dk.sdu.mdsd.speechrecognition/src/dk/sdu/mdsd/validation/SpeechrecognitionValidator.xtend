@@ -91,4 +91,6 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 				TYPEMISMATCH_AGENT_ENABLELOGGING)
 		}
 	}
+	
+	// validate that agent/intent/entity is only written once, 2 agents =/= allowed
 }

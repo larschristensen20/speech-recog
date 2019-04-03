@@ -7,7 +7,7 @@ Model:
 ;
 
 Agent:
-	{Agent} 'agent' '{'value+=AgentValue*'}'
+	{Agent} 'Agent' '{'value+=AgentValue*'}'
 ;
 
 AgentValue:
@@ -23,7 +23,7 @@ Value:
 ;
 
 ValueName:
-	name=ID
+	name=ID 
 ;
 
 Bool:
@@ -33,7 +33,7 @@ Bool:
 
 // Intents----------------------------------------------------------------------------------------------------------------
 Intent:
-	{Intent} 'intent' '{'value+=IntentValue*'}'
+	{Intent} 'Intent' '{'value+=IntentValue*'}'
 ;
 
 IntentValue:
@@ -74,7 +74,7 @@ Sentence:
 ;
 
 Words:
-	name = ID
+	name = STRING
 ;
 
 Parameters:
@@ -82,17 +82,17 @@ Parameters:
 ;
 
 Parameter:
-	('required')? 'parameter' '{''name' '=' name=ID 'entityType' '=' type=ID ('prompt' ':' prompt+=Prompt(','prompt+=Prompt)*)? '}'
+	('required')? 'parameter' '{''name' '=' name=ID 'entityType' '=' type=ID  prompt+=Prompt* '}'
 ;
 
 Prompt:
-	name=ID
+	{Prompt} ('prompt' ':' (words+=Words(',' words+=Words)*)+)
 ;
 
 
 // EntityType ---------------------------------------------------------------------------------------------------------------------
 EntityType:
-	'entityType' '{' 'name' '=' name=ID 'autoExpansition' '=' exp=('true'|'false') entities+=Entities+ '}'	
+	'EntityType' '{' 'name' '=' name=ID 'autoExpansition' '=' exp=('true'|'false') entities+=Entities+ '}'	
 ;
 
 Entities:
