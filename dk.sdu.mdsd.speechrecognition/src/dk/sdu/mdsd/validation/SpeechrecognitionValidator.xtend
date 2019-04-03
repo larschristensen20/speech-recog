@@ -22,6 +22,11 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 	public static val MISSING_AGENT_DEFAULTLANGUAGECODE = 'missingAgentDefaultLanguageCode'
 	public static val MISSING_AGENT_TIMEZONE = 'missingAgentTimezone'
 	public static val MISSING_AGENT_ENABLELOGGING = 'missingAgentEnableLogging'
+	public static val TYPEMISMATCH_AGENT_PARENT = 'typeMismatchAgentEnableLogging'
+	public static val TYPEMISMATCH_AGENT_DISPLAYNAME = 'typeMismatchAgentEnableLogging'
+	public static val TYPEMISMATCH_AGENT_DEFAULTLANGUAGECODE = 'typeMismatchAgentEnableLogging'
+	public static val TYPEMISMATCH_AGENT_TIMEZONE = 'typeMismatchAgentEnableLogging'
+	public static val TYPEMISMATCH_AGENT_ENABLELOGGING = 'typeMismatchAgentEnableLogging'
 	ArrayList<String> agentValues = new ArrayList<String>();
 	
 	@Check
@@ -52,18 +57,38 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 					MISSING_AGENT_ENABLELOGGING)
 		}
 		agentValues.clear
-		for(AgentValue v : agent.value) {
+		/*for(AgentValue v : agent.value) {
 			System.out.println(v.value.bool)
-		}
+		}*/
 	}
 	
 	
 	@Check
 	def checkIfParamsAreAllowed(AgentValue agentVal) {
-		if(agentVal.aa === "parent" && (agentVal.value.bool === 'true' || agentVal.value.bool === 'false')) {
-			error('Type mismatch: parent cannot be set to ' +agentVal.value.bool, 
-				SpeechrecognitionPackage.Literals.AGENT__VALUE,
-				MISSING_AGENT_PARENT)
+		if(agentVal.aa == "parent" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_PARENT)
+		}
+		if(agentVal.aa == "displayName" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_DISPLAYNAME)
+		}
+		if(agentVal.aa == "defaultLanguageCode" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_DEFAULTLANGUAGECODE)
+		}
+		if(agentVal.aa == "timezone" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_TIMEZONE)
+		}
+		if(agentVal.aa == "enableLogging" && (agentVal.value.^val.name !== 'true' || agentVal.value.^val.name !== 'false')) {
+			error('Type mismatch:  '+ agentVal.aa + ' cannot be set to ' +agentVal.value.^val.name.class.typeName, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_ENABLELOGGING)
 		}
 	}
 }

@@ -19,7 +19,7 @@ AgentAttribute:
 ;
 
 Value:
-	ValueName | bool=Bool
+	val=ValueName | bool=Bool
 ;
 
 ValueName:
