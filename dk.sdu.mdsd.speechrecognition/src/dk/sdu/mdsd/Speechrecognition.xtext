@@ -33,20 +33,20 @@ Bool:
 
 // Intents----------------------------------------------------------------------------------------------------------------
 Intent:
-	{Intent} 'Intent' '{'value+=IntentValue*'}'
+	{Intent} 'Intent' '{'values+=IntentValue*'}'
 ;
 
 IntentValue:
-	IntentRequired | IntentOptional
+    IntentRequired | IntentOptional
 ;
 
 IntentRequired:
-	IntentDisplayNameRequired
+	req=IntentDisplayNameRequired
 ;
 
 
 IntentDisplayNameRequired:
-	'displayName' '=' name=ID
+	v='displayName' '=' name=ID
 ;
 
 IntentOptional:
@@ -66,7 +66,7 @@ TrainingPhrases:
 ;
 
 Phrase:
-	'phrase' ':' sentences+=Sentence(',' sentences+=Sentence)*
+	'phrase' '=' sentences+=Sentence(',' sentences+=Sentence)*
 ;
 
 Sentence:
@@ -82,17 +82,17 @@ Parameters:
 ;
 
 Parameter:
-	('required')? 'parameter' '{''name' '=' name=ID 'entityType' '=' type=ID  prompt+=Prompt* '}'
+	req=('required')? 'parameter' name=ID '{' 'entityType' '=' type=ID  prompts+=Prompt* '}'
 ;
 
 Prompt:
-	{Prompt} ('prompt' ':' (words+=Words(',' words+=Words)*)+)
+	{Prompt} ('prompt' '=' (words+=Words(',' words+=Words)*)+)
 ;
 
 
 // EntityType ---------------------------------------------------------------------------------------------------------------------
 EntityType:
-	'EntityType' '{' 'name' '=' name=ID 'autoExpansition' '=' exp=('true'|'false') entities+=Entities+ '}'	
+	'EntityType' name=ID '{' a='autoExpansition' '=' exp=('true'|'false') entities+=Entities+ '}'	
 ;
 
 Entities:
