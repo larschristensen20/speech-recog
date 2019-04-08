@@ -5,22 +5,16 @@ package dk.sdu.mdsd.validation
 
 import dk.sdu.mdsd.speechrecognition.Agent
 import dk.sdu.mdsd.speechrecognition.AgentValue
-import dk.sdu.mdsd.speechrecognition.SpeechrecognitionPackage
-import java.util.ArrayList
-import org.eclipse.xtext.validation.Check
-import dk.sdu.mdsd.speechrecognition.Parameters
-import dk.sdu.mdsd.speechrecognition.Parameter
-import dk.sdu.mdsd.speechrecognition.Words
-import dk.sdu.mdsd.speechrecognition.Prompt
-import dk.sdu.mdsd.speechrecognition.Phrase
-import dk.sdu.mdsd.speechrecognition.Sentence
-import dk.sdu.mdsd.speechrecognition.IntentDisplayNameRequired
+import dk.sdu.mdsd.speechrecognition.Intent
 import dk.sdu.mdsd.speechrecognition.IntentRequired
 import dk.sdu.mdsd.speechrecognition.IntentValue
-import dk.sdu.mdsd.speechrecognition.Intent
-import org.eclipse.emf.ecore.EObject
-import java.util.HashMap
-import java.util.Map
+import dk.sdu.mdsd.speechrecognition.Parameter
+import dk.sdu.mdsd.speechrecognition.Prompt
+import dk.sdu.mdsd.speechrecognition.Sentence
+import dk.sdu.mdsd.speechrecognition.SpeechrecognitionPackage
+import dk.sdu.mdsd.speechrecognition.Words
+import java.util.ArrayList
+import org.eclipse.xtext.validation.Check
 
 /**
  * This class contains custom validation rules. 
