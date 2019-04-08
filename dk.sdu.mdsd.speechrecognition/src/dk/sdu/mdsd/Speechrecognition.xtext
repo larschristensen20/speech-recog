@@ -7,11 +7,11 @@ Model:
 ;
 
 Agent:
-	{Agent} 'agent' '{'value+=AgentValue*'}'
+	{Agent} 'Agent' '{'value+=AgentValue*'}'
 ;
 
 AgentValue:
-	aa=AgentAttribute '=' value=Value
+	aa=AgentAttribute ':' value=Value
 ;
 
 AgentAttribute:
@@ -23,7 +23,7 @@ Value:
 ;
 
 ValueName:
-	name=ID
+	name=ID 
 ;
 
 Bool:
@@ -33,20 +33,20 @@ Bool:
 
 // Intents----------------------------------------------------------------------------------------------------------------
 Intent:
-	{Intent} 'intent' '{'value+=IntentValue*'}'
+	{Intent} 'Intent' '{'values+=IntentValue*'}'
 ;
 
 IntentValue:
-	IntentRequired | IntentOptional
+    IntentRequired | IntentOptional
 ;
 
 IntentRequired:
-	IntentDisplayNameRequired
+	req=IntentDisplayNameRequired
 ;
 
 
 IntentDisplayNameRequired:
-	'displayName' '=' name=ID
+	v='displayName' ':' name=ID
 ;
 
 IntentOptional:
@@ -54,7 +54,7 @@ IntentOptional:
 ;
 
 KeyValue:
-	'action' '=' name=ID
+	'action' ':' name=ID
 ;
 
 List:
@@ -74,7 +74,7 @@ Sentence:
 ;
 
 Words:
-	name = ID
+	name = STRING
 ;
 
 Parameters:
@@ -82,17 +82,17 @@ Parameters:
 ;
 
 Parameter:
-	('required')? 'parameter' '{''name' '=' name=ID 'entityType' '=' type=ID ('prompt' ':' prompt+=Prompt(','prompt+=Prompt)*)? '}'
+	req=('required')? 'parameter' name=ID '{' 'entityType' ':' type=ID  prompts+=Prompt* '}'
 ;
 
 Prompt:
-	name=ID
+	{Prompt} ('prompt' ':' (words+=Words(',' words+=Words)*)+)
 ;
 
 
 // EntityType ---------------------------------------------------------------------------------------------------------------------
 EntityType:
-	'entityType' '{' 'name' '=' name=ID 'autoExpansition' '=' exp=('true'|'false') entities+=Entities+ '}'	
+	'EntityType' name=ID '{' a='autoExpansition' ':' exp=('true'|'false') entities+=Entities+ '}'	
 ;
 
 Entities:
@@ -100,7 +100,7 @@ Entities:
 ;
 
 Entity:
-	'entity' '{' 'value' '=' value=ID 'synonym' '=' syn+=Synonym(',' syn+=Synonym)* '}'
+	'entity' '{' 'value' ':' value=ID 'synonym' ':' syn+=Synonym(',' syn+=Synonym)* '}'
 ;
 
 Synonym:

@@ -3,11 +3,18 @@
  */
 package dk.sdu.mdsd.validation
 
-import dk.sdu.mdsd.speechrecognition.AgentValue
-import dk.sdu.mdsd.speechrecognition.SpeechrecognitionPackage
-import org.eclipse.xtext.validation.Check
 import dk.sdu.mdsd.speechrecognition.Agent
+import dk.sdu.mdsd.speechrecognition.AgentValue
+import dk.sdu.mdsd.speechrecognition.Intent
+import dk.sdu.mdsd.speechrecognition.IntentRequired
+import dk.sdu.mdsd.speechrecognition.IntentValue
+import dk.sdu.mdsd.speechrecognition.Parameter
+import dk.sdu.mdsd.speechrecognition.Prompt
+import dk.sdu.mdsd.speechrecognition.Sentence
+import dk.sdu.mdsd.speechrecognition.SpeechrecognitionPackage
+import dk.sdu.mdsd.speechrecognition.Words
 import java.util.ArrayList
+import org.eclipse.xtext.validation.Check
 
 /**
  * This class contains custom validation rules. 
@@ -27,10 +34,132 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 	public static val TYPEMISMATCH_AGENT_DEFAULTLANGUAGECODE = 'typeMismatchAgentEnableLogging'
 	public static val TYPEMISMATCH_AGENT_TIMEZONE = 'typeMismatchAgentEnableLogging'
 	public static val TYPEMISMATCH_AGENT_ENABLELOGGING = 'typeMismatchAgentEnableLogging'
+	public static val ONLY_ONE_AGENT_ALLOWED = 'onlyOneAgentInstanceIsAllowed'
+	public static val IF_REQUIRED_PARAM_THEN_PROMPT = 'requiredParameterMustContainPrompt'
+	public static val PROMPT_STRING_SHOULD_NOT_BE_EMPTY = 'promptStringShouldNotBeEmpty'
+	public static val PHRASE_STRING_SHOULD_NOT_BE_EMPTY = 'phraseStringShouldNotBeEmpty'
+	public static val MISSING_INTENT_DISPLAYNAME = 'missingIntentDisplayName'
 	ArrayList<String> agentValues = new ArrayList<String>();
+	ArrayList<String> intentValues = new ArrayList<String>();
+//	Map<Integer, agentValues> valMap = new HashMap<int, agentValues>();
+	
+	// MIssing validation:
+	// Agent and Intent: validate that only 1 of each parameter has been written.
 	
 	@Check
 	def checkIfAgentParamsAreMissing(Agent agent) {
+		checkAgentParams(agent)
+	}
+	
+	
+	@Check
+	def checkIfAgentParamsAreAllowed(AgentValue agentVal) {
+		if(agentVal.value.bool == 'true' || agentVal.value.bool == 'false') {
+			checkAgentParams(agentVal)
+		}
+	}
+	
+	@Check
+	def checkAgentMultipleSameParams(AgentValue agentVal) {
+		checkAgentMultipleParams(agentVal)
+	}
+
+	@Check
+	def ifRequiredParameterThenPrompts(Parameter param){
+		if(param.req == "required" && param.prompts.isEmpty()) {
+			error("You must create at least one prompt if the parameter is: "+ param.req.toString(),
+				SpeechrecognitionPackage.Literals.PARAMETER__REQ,
+				IF_REQUIRED_PARAM_THEN_PROMPT)
+		}
+	}
+	
+	@Check
+	def promptStringShouldNotBeEmpty(Prompt p) {
+		for(Words w : p.words) {			
+			if("".equals(w.name)) {
+				warning("A prompt should not be empty",
+					SpeechrecognitionPackage.Literals.PROMPT__WORDS,
+					PROMPT_STRING_SHOULD_NOT_BE_EMPTY
+				)
+			}
+		}
+	}
+	
+	@Check
+	def phraseStringShouldNotBeEmpty(Sentence s) {
+		for(Words w : s.words) {			
+			if("".equals(w.name)) {
+				warning("A phrase should not be empty",
+					SpeechrecognitionPackage.Literals.SENTENCE__WORDS,
+					PHRASE_STRING_SHOULD_NOT_BE_EMPTY
+				)
+			}
+		}
+	}
+	
+	@Check
+	def checkIntentDisplayNameIsNotNull(Intent i) {
+		checkIntentParams(i);
+	}
+	
+	
+	def checkAgentParams(AgentValue agentVal) {
+		if(agentVal.aa == "parent" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_PARENT)
+		}
+		if(agentVal.aa == "displayName" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_DISPLAYNAME)
+		}
+		if(agentVal.aa == "defaultLanguageCode" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_DEFAULTLANGUAGECODE)
+		}
+		if(agentVal.aa == "timezone" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_TIMEZONE)
+		}
+		if(agentVal.aa == "enableLogging" && (agentVal.value.^val.name !== 'true' || agentVal.value.^val.name !== 'false')) {
+			error('Type mismatch:  '+ agentVal.aa + ' cannot be set to ' +agentVal.value.^val.name.class.typeName, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_ENABLELOGGING)
+		}
+	}
+	
+	def checkAgentMultipleParams(AgentValue agentVal) {
+		if(agentVal.aa == "parent" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_PARENT)
+		}
+		if(agentVal.aa == "displayName" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_DISPLAYNAME)
+		}
+		if(agentVal.aa == "defaultLanguageCode" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_DEFAULTLANGUAGECODE)
+		}
+		if(agentVal.aa == "timezone" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
+			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_TIMEZONE)
+		}
+		if(agentVal.aa == "enableLogging" && (agentVal.value.^val.name !== 'true' || agentVal.value.^val.name !== 'false')) {
+			error('Type mismatch:  '+ agentVal.aa + ' cannot be set to ' +agentVal.value.^val.name.class.typeName, 
+				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+				TYPEMISMATCH_AGENT_ENABLELOGGING)
+		}
+	}
+	
+	def checkAgentParams(Agent agent) {
 		for(AgentValue v : agent.value) {
 			agentValues.add(v.aa)
 		}
@@ -57,38 +186,20 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 					MISSING_AGENT_ENABLELOGGING)
 		}
 		agentValues.clear
-		/*for(AgentValue v : agent.value) {
-			System.out.println(v.value.bool)
-		}*/
 	}
 	
-	
-	@Check
-	def checkIfParamsAreAllowed(AgentValue agentVal) {
-		if(agentVal.aa == "parent" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
-			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
-				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
-				TYPEMISMATCH_AGENT_PARENT)
-		}
-		if(agentVal.aa == "displayName" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
-			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
-				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
-				TYPEMISMATCH_AGENT_DISPLAYNAME)
-		}
-		if(agentVal.aa == "defaultLanguageCode" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
-			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
-				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
-				TYPEMISMATCH_AGENT_DEFAULTLANGUAGECODE)
-		}
-		if(agentVal.aa == "timezone" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
-			error('Type mismatch: '+ agentVal.aa + ' cannot be set to ' +agentVal.value.bool, 
-				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
-				TYPEMISMATCH_AGENT_TIMEZONE)
-		}
-		if(agentVal.aa == "enableLogging" && (agentVal.value.^val.name !== 'true' || agentVal.value.^val.name !== 'false')) {
-			error('Type mismatch:  '+ agentVal.aa + ' cannot be set to ' +agentVal.value.^val.name.class.typeName, 
-				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
-				TYPEMISMATCH_AGENT_ENABLELOGGING)
-		}
+	def checkIntentParams(Intent i) {
+		for(IntentValue v : i.values) {
+			if(v instanceof IntentRequired) {
+				intentValues.add(v.req.v)	
+			}
+			
+		}		
+		if (!intentValues.contains('displayName')) {
+			error('You must define the displayName variable', 
+					SpeechrecognitionPackage.Literals.INTENT__VALUES,
+					MISSING_AGENT_PARENT)
+		} 
+		intentValues.clear
 	}
 }
