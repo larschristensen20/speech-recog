@@ -6,19 +6,13 @@ package dk.sdu.mdsd.validation
 import dk.sdu.mdsd.speechrecognition.Agent
 import dk.sdu.mdsd.speechrecognition.AgentValue
 import dk.sdu.mdsd.speechrecognition.Intent
-import dk.sdu.mdsd.speechrecognition.IntentRequired
 import dk.sdu.mdsd.speechrecognition.IntentValue
 import dk.sdu.mdsd.speechrecognition.Parameter
 import dk.sdu.mdsd.speechrecognition.Prompt
 import dk.sdu.mdsd.speechrecognition.Sentence
 import dk.sdu.mdsd.speechrecognition.SpeechrecognitionPackage
 import dk.sdu.mdsd.speechrecognition.Words
-import java.util.ArrayList
 import org.eclipse.xtext.validation.Check
-import java.util.Map
-import java.util.HashMap
-import java.util.Set
-import java.util.HashSet
 
 /**
  * This class contains custom validation rules. 
@@ -106,20 +100,20 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 		}
 	}
 	
-	@Check
+	/* @Check
 	def checkIntentDisplayNameIsNotNull(Intent i) {
 		checkIntentParams(i);
-	}
+	}*/
 	
 	@Check
 	def checkIntentHasOnlyOneOfEachParam(Intent intent) {
 		val intentValSet = newHashSet
-		for(var i = 0 ; i < intent.values.length ; i++) {
-			if(!intentValSet.add(intent.values.get(i).va)){
-				error("duplicate entry", intent.values.get(i), null, "code")
+			for (IntentValue v : intent.values) {
+				if(!intentValSet.add(v.iv.v)){
+					error("duplicate entry", v.iv, null, "code")
+				}
 			}
 		}		
-	}
 	
 	@Check
 	def checkAgentHasOnlyOneOfEachParam(Agent a) {
@@ -215,12 +209,12 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 					MISSING_AGENT_ENABLELOGGING)
 		}
 	}
-	
+	/* 
 	def checkIntentParams(Intent i) {
 		val intentValues = newArrayList
 		for(IntentValue v : i.values) {
-			if(v instanceof IntentRequired) {
-				intentValues.add(v.req.v)	
+			if(v.va instanceof IntentRequired) {
+				intentValues.add(v.va)
 			}
 		}		
 		if (!intentValues.contains('displayName')) {
@@ -228,5 +222,5 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 					SpeechrecognitionPackage.Literals.INTENT__VALUES,
 					MISSING_INTENT_DISPLAYNAME)
 		} 
-	}
+	}*/
 }
