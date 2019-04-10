@@ -7,7 +7,7 @@ Model:
 ;
 
 Agent:
-	{Agent} 'Agent' '{'value+=AgentValue*'}'
+	{Agent} 'Agent' '{'values+=AgentValue*'}'
 ;
 
 AgentValue:
@@ -19,7 +19,7 @@ AgentAttribute:
 ;
 
 Value:
-	val=ValueName | bool=Bool
+	v=ValueName | bool=Bool
 ;
 
 ValueName:
@@ -37,7 +37,7 @@ Intent:
 ;
 
 IntentValue:
-    IntentRequired | IntentOptional
+    va=IntentRequired | va=IntentOptional
 ;
 
 IntentRequired:

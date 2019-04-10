@@ -15,6 +15,10 @@ import dk.sdu.mdsd.speechrecognition.SpeechrecognitionPackage
 import dk.sdu.mdsd.speechrecognition.Words
 import java.util.ArrayList
 import org.eclipse.xtext.validation.Check
+import java.util.Map
+import java.util.HashMap
+import java.util.Set
+import java.util.HashSet
 
 /**
  * This class contains custom validation rules. 
@@ -39,10 +43,6 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 	public static val PROMPT_STRING_SHOULD_NOT_BE_EMPTY = 'promptStringShouldNotBeEmpty'
 	public static val PHRASE_STRING_SHOULD_NOT_BE_EMPTY = 'phraseStringShouldNotBeEmpty'
 	public static val MISSING_INTENT_DISPLAYNAME = 'missingIntentDisplayName'
-	ArrayList<String> agentValues = new ArrayList<String>();
-	ArrayList<String> intentValues = new ArrayList<String>();
-//	Map<Integer, agentValues> valMap = new HashMap<int, agentValues>();
-	
 	// MIssing validation:
 	// Agent and Intent: validate that only 1 of each parameter has been written.
 	
@@ -51,6 +51,15 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 		checkAgentParams(agent)
 	}
 	
+	@Check
+	def checkIfAgentParamsAreUpper(AgentValue av) {
+		if (!Character.isUpperCase(av.value.v.name.charAt(0))) {
+        warning('Agent attributes should start with a capital', 
+                SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
+                -1,
+                INVALID_NAME)
+    }
+	}
 	
 	@Check
 	def checkIfAgentParamsAreAllowed(AgentValue agentVal) {
@@ -102,6 +111,25 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 		checkIntentParams(i);
 	}
 	
+	@Check
+	def checkIntentHasOnlyOneOfEachParam(Intent intent) {
+		val intentValSet = newHashSet
+		for(var i = 0 ; i < intent.values.length ; i++) {
+			if(!intentValSet.add(intent.values.get(i).va)){
+				error("duplicate entry", intent.values.get(i), null, "code")
+			}
+		}		
+	}
+	
+	@Check
+	def checkAgentHasOnlyOneOfEachParam(Agent a) {
+		val agentValSet = newHashSet
+		for(var i = 0 ; i < a.values.length ; i++) {
+			if(!agentValSet.add(a.values.get(i).aa)){
+				error("duplicate entry", a.values.get(i), null, "code")
+			}
+		}		
+	}
 	
 	def checkAgentParams(AgentValue agentVal) {
 		if(agentVal.aa == "parent" && (agentVal.value.bool == 'true' || agentVal.value.bool == 'false')) {
@@ -124,8 +152,8 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
 				TYPEMISMATCH_AGENT_TIMEZONE)
 		}
-		if(agentVal.aa == "enableLogging" && (agentVal.value.^val.name !== 'true' || agentVal.value.^val.name !== 'false')) {
-			error('Type mismatch:  '+ agentVal.aa + ' cannot be set to ' +agentVal.value.^val.name.class.typeName, 
+		if(agentVal.aa == "enableLogging" && (agentVal.value.v.name !== 'true' || agentVal.value.v.name !== 'false')) {
+			error('Type mismatch:  '+ agentVal.aa + ' cannot be set to ' +agentVal.value.v.name.class.typeName, 
 				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
 				TYPEMISMATCH_AGENT_ENABLELOGGING)
 		}
@@ -152,54 +180,53 @@ class SpeechrecognitionValidator extends AbstractSpeechrecognitionValidator {
 				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
 				TYPEMISMATCH_AGENT_TIMEZONE)
 		}
-		if(agentVal.aa == "enableLogging" && (agentVal.value.^val.name !== 'true' || agentVal.value.^val.name !== 'false')) {
-			error('Type mismatch:  '+ agentVal.aa + ' cannot be set to ' +agentVal.value.^val.name.class.typeName, 
+		if(agentVal.aa == "enableLogging" && (agentVal.value.v.name !== 'true' || agentVal.value.v.name !== 'false')) {
+			error('Type mismatch:  '+ agentVal.aa + ' cannot be set to ' +agentVal.value.v.name.class.typeName, 
 				SpeechrecognitionPackage.Literals.AGENT_VALUE__VALUE,
 				TYPEMISMATCH_AGENT_ENABLELOGGING)
 		}
 	}
 	
 	def checkAgentParams(Agent agent) {
-		for(AgentValue v : agent.value) {
+		val agentValues = newArrayList
+		for(AgentValue v : agent.values) {
 			agentValues.add(v.aa)
 		}
 		
 		if (!agentValues.contains('parent')) {
 		error('You must define the parent variable', 
-				SpeechrecognitionPackage.Literals.AGENT__VALUE,
+				SpeechrecognitionPackage.Literals.AGENT__VALUES,
 				MISSING_AGENT_PARENT)
 		} else if (!agentValues.contains('displayName')) {
 			error('You must define the displayName variable', 
-					SpeechrecognitionPackage.Literals.AGENT__VALUE,
+					SpeechrecognitionPackage.Literals.AGENT__VALUES,
 					MISSING_AGENT_DISPLAYNAME)
 		} else if (!agentValues.contains('defaultLanguageCode')) {
 			error('You must define the defaultLanguageCode variable', 
-					SpeechrecognitionPackage.Literals.AGENT__VALUE,
+					SpeechrecognitionPackage.Literals.AGENT__VALUES,
 					MISSING_AGENT_DEFAULTLANGUAGECODE)
 		} else if (!agentValues.contains('timezone')) {
 			error('You must define the timezone variable', 
-					SpeechrecognitionPackage.Literals.AGENT__VALUE,
+					SpeechrecognitionPackage.Literals.AGENT__VALUES,
 					MISSING_AGENT_TIMEZONE)
 		} else if (!agentValues.contains('enableLogging')) {
 			error('You must define the enableLogging variable', 
-					SpeechrecognitionPackage.Literals.AGENT__VALUE,
+					SpeechrecognitionPackage.Literals.AGENT__VALUES,
 					MISSING_AGENT_ENABLELOGGING)
 		}
-		agentValues.clear
 	}
 	
 	def checkIntentParams(Intent i) {
+		val intentValues = newArrayList
 		for(IntentValue v : i.values) {
 			if(v instanceof IntentRequired) {
 				intentValues.add(v.req.v)	
 			}
-			
 		}		
 		if (!intentValues.contains('displayName')) {
 			error('You must define the displayName variable', 
 					SpeechrecognitionPackage.Literals.INTENT__VALUES,
-					MISSING_AGENT_PARENT)
+					MISSING_INTENT_DISPLAYNAME)
 		} 
-		intentValues.clear
 	}
 }
